@@ -15,17 +15,18 @@ create an AutomatonController object. A line containing a single * should be out
 terminal window, representing the initial state of the automaton. Call the step method a few 
 times to see how the state progresses. Then try the run method. 
 
-26b.
+26b.Makes interesting repeating patterns!
 
 27. After running the automaton, clear the Terminal window, call the reset method and repeat 
 the process in the previous exercise. Do exactly the same patterns emerge? 
 
-27b.
+27b. Yes, it is the same output as the first time around.
 
 28. How is the fill method of the java.util.Arrays class used in the reset method of 
 Automaton?
 
-28b.
+28b. "Arrays.fill(state, 0);", it simply places 0 in all of the slots in the entire array.
+In a way, it is putting the equivilant of null in all of its cells
 
 29. Alter the reset method of Automaton so that more than one cell is initially in the 1-
 state. Do different patterns emerge this time? Are those patterns deterministic – i.e., 
