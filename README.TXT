@@ -33,26 +33,92 @@ state. Do different patterns emerge this time? Are those patterns deterministic 
 does a particular starting state for the automaton always result in the same pattern emerging? 
 
 29b.
+/**
+     * Reset the automaton.
+     */
+    public void reset()
+    {
+        Arrays.fill(state, 0);
+        // Seed the automaton with a single 'on' cell.
+        state[numberOfCells / 2] = 1;
+        state[0] = 1;
+    }
 
-30. Rewrite the two if-else statements in the loop of the update method of the Automaton class of 
-automaton-v1 so that the assignments to left and right use the conditional operator. 
+Yes, it is different. The start of the automaton is now twice as present with the 
+addition of my code. So now both dots lead to the same pattern which mesh together once their 
+patterns start touching together, not seemlessly but they do mesh.
+
+30. Rewrite the two if-else statements in the loop of the update method of the Automaton 
+class of automaton-v1 so that the assignments to left and right use the conditional operator. 
 
 30b.
+    /**
+     * Update the automaton to its next state.
+     */
+    public void update()
+    {
+        // Build the new state in a separate array.
+        int[] nextState = new int[state.length];
+        // Naively update the state of each cell
+        // based on the state of its two neighbors.
+        for(int i = 0; i < state.length; i++) {
+            int left, center, right;
+            
+            left = (i == 0) ? 0 : state[i - 1];
+            
+            center = state[i];
+            
+            right = (i + 1 < state.length) ? state[i + 1] : 0;
+            
+            nextState[i] = (left + center + right) % 2;
+        }
+        state = nextState;
+    }
 
 31. Why have we created a new array, nextState, in the update method, rather than using the 
 state array directly? Change the assignment to nextState to be an assignment to state in the 
 loop body, to see if it makes any different to the automaton’s behavior. If it does, can you
 explain why? 
 
-31b.
+31b.Nothing appears on the terminal. I think its because, by not using a newState array, we 
+keep on simply overwritting whatever calculations done onto the original state. So the 
+nextState array is nothing, because we continously overwrite it. Also, we never end up using 
+the newly created newState array because we still asign state to newState at the end of the 
+method.
 
 32. Can you find a way to avoid the problems illustrated in the previous exercise without 
 using a new array? Hint: how many cells’ old values need to be retained on each iteration? In 
 your opinion, which version is better: using a complete array or your solution? Justify your 
 answer. 
 
-32b.
-
+32b.We need to retain the first and second values of the array, because they are the very 
+begining of this array, so left is out of bounds when we start, so left = 0 and center is 
+simply the first real cell to be found, the first cell of our array. So that leaves right, 
+and right is always going to change depending on the loop. So after an iteration, center 
+becomes the new left and the right becomes the new center. See how right is always being 
+retrieved from the old array in order to calculate our state. In a way, we are making a 
+sliding window of 3 cells. Each iteration, moves it by one, where, we need to get the newest 
+value in the index i + 1. So we only need to remember that new number being found, not the 
+left or center values.
+/**
+     * Update the automaton to its next state.
+     */
+    public void update()
+    {
+        int left, center, right;
+        left = 0;
+        center = state[0];
+        // Naively update the state of each cell
+        // based on the state of its two neighbors.
+        for(int i = 0; i < state.length; i++) {            
+            right = (i + 1 < state.length) ? state[i + 1] : 0;
+            
+            state[i] = (left + center + right) % 2;
+            
+            left = center;
+            center = right;
+        }
+    }
 33. What we really want to see in the body of a loop are statements to be executed on every 
 iteration. Use the following code to rewrite the update method and avoid special cases for 
 the first and last iterations:
@@ -65,7 +131,26 @@ int left = 0;
  center = right;
  }
 
-33b.
+33b.ok!
+/**
+     * Update the automaton to its next state.
+     */
+    public void update()
+    {
+        // Build the new state in a separate array.
+        int[] nextState = new int[state.length];
+        // Naively update the state of each cell
+        // based on the state of its two neighbors.
+        int left = 0;
+        int center = state[0];
+        for (int i=0; i<state.length; i++){
+            int right = i + 1 < state.length ? state[i+1] : 0;
+            nextState[i] = (left + center + right) % 2;
+            left = center;
+            center = right;
+        }
+        state = nextState;
+    }
 
 34. Add a method calculateNextState to the Automaton class that takes the three values, left, 
 center, and right, and returns the calculation of the value of the next state. The next state 
@@ -73,7 +158,13 @@ of a cell was previously calculated using the following line of code:
 nextState[i] = (left + center + right) % 2; 
 Change this line to make use of your new method instead. 
 
-34b.
+34b.ok!
+public int calculateNextState(int left, int center, int right)
+    {
+        int nextState;
+        nextState = (left + center + right) % 2;
+        return nextState;
+    }
 
 35. Experiment with different ways to calculate the next state of a cell through combining 
 the values of left, center, and right, always ensuring that the result is calculated modulo 
