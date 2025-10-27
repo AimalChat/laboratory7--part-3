@@ -176,7 +176,9 @@ How many different sets of unique rules do you think there are to calculate a ce
 or 1 state given the three binary values in left, center, and right? Is there an infinite 
 number of possibilities?
 
-35b.
+35b. I think so, because the modulo operator usually return either a 1 or a 0 to determine if 
+it is either an odd or even number. So yes, I do think there is an infinity number of 
+possibilities.
 
 36. Improve your code to avoid having to keep testing for the end of the array when setting 
 right. Extend the array by one element that contains the value 0 in order to serve as the 
@@ -192,7 +194,47 @@ The revised body of the update method should look like:
  center = right;
  } 
 
-36b.
+36b. This one was hard, because the automaton project is not in the 5th edition!
+/**
+     * Update the automaton to its next state.
+     * Acts like a sliding window of 3 cells where only the right
+     * neighbour of the center psositon is fetched from the copy of
+     * state array. Now, do a sliding window motion by an increment of 1
+     * So,after moving center position by one, we shift by one.
+     * Meaning, center becomes new left, and right becomes new center.
+     */
+    public void update()
+    {
+        // Build the new state in a separate array.
+        int[] nextState = new int[state.length];
+        //Create the final extended array with ghost cell.(is the next step)
+        final int[] copy = Arrays.copyOf(state, state.length + 1);
+        // Naively update the state of each cell
+        // based on the state of its two neighbors.
+        int left = 0;
+        //read from our new safe array
+        //Though I believe reading from the OG state works?
+        int center = copy[0];
+        /**
+         * The conditon is state.length, not copy.length because we want 
+         * to read only from indexes available and not extra ghost cell 
+         * from the copy one, I think.
+         */
+        for (int i=0; i<state.length; i++){
+            //base on the copy, because it has that i+1 cell that state has not.
+            int right = copy[i+1];
+            //calculate to find either 1 or 0.
+            nextState[i] = calculateNextState(left, center, right);
+            //sliding window described above.
+            left = center;
+            center = right;
+        }
+        /**
+         * We put all the newly found values of the nextState array into 
+         * state in order to print it when doing whether run or step method.
+         */
+        state = nextState;
+    }
 
 37. Experiment with different initialization patterns of the lookup table in automaton-v4. 
 
